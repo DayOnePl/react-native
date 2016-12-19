@@ -77,4 +77,87 @@ RCT_EXPORT_VIEW_PROPERTY(mostRecentEventCount, NSInteger)
   };
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(withCompletions, BOOL, RCTTextField)
+{
+  if (json && [RCTConvert BOOL:json]) {
+    UIToolbar* toolbar = [[UIToolbar alloc] init];
+    toolbar.tintColor = [UIColor colorWithRed:0.88 green:0.31 blue:0.26 alpha:1];
+    [toolbar sizeToFit];
+    
+    UIScrollView* scrollView = [[UIScrollView alloc]initWithFrame:[toolbar frame]];
+    scrollView.showsVerticalScrollIndicator = NO;
+    scrollView.showsHorizontalScrollIndicator = NO;
+    scrollView.backgroundColor = [UIColor colorWithRed:0.96 green:0.96 blue:0.95 alpha:1];
+    
+    
+    [scrollView addSubview:toolbar];
+    
+    view.inputAccessoryView = scrollView;
+  } else {
+    view.inputAccessoryView = nil;
+  }
+}
+
+RCT_EXPORT_VIEW_PROPERTY(submitOnComplete, BOOL)
+
+RCT_CUSTOM_VIEW_PROPERTY(completions, NSArray*, RCTTextField)
+{
+  if (view.inputAccessoryView) {
+    //    UIToolbar *toolbar = (UIToolbar *)view.inputAccessoryView;
+    UIScrollView *scroll = (UIScrollView *)view.inputAccessoryView;
+    UIToolbar *toolbar = [[scroll subviews] firstObject];
+    
+    if(json) {
+      NSArray* completions = [RCTConvert NSArray:json];
+      
+      NSString *last = [completions lastObject];
+      if(completions.count > 0) {
+        NSMutableArray *items = [NSMutableArray arrayWithCapacity:([completions count] * 2) -1];
+        
+        CGFloat separatorHeight = toolbar.frame.size.height * 0.4;
+        
+        for(NSString* completion in completions) {
+          UIBarButtonItem* button = [[UIBarButtonItem alloc]initWithTitle:completion
+                                                                    style:UIBarButtonItemStylePlain
+                                                                   target:view
+                                                                   action:@selector(completionSelected:)];
+          
+          UIFont * font = [UIFont systemFontOfSize:14];
+          NSDictionary * attributes = @{NSFontAttributeName: font};
+          [button setTitleTextAttributes:attributes forState:UIControlStateNormal];
+          
+          [items addObject:button];
+          
+          if(completion != last) {
+            UIView * separator = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1, separatorHeight)];
+            separator.backgroundColor = toolbar.tintColor;
+            UIBarButtonItem *separatorButton = [[UIBarButtonItem alloc]initWithCustomView:separator];
+            
+            [items addObject:separatorButton];
+          }
+        }
+      
+        toolbar.items = items;
+        
+        UIView* lastButton = toolbar.subviews.lastObject;
+        float newWidth = lastButton.frame.origin.x +
+                         lastButton.frame.size.width +
+                         lastButton.layoutMargins.right +
+                         toolbar.layoutMargins.left;
+        CGRect toolbarFrame = CGRectMake(0, 0, newWidth, toolbar.frame.size.height);
+        
+        [toolbar setFrame:toolbarFrame];
+        scroll.contentSize = toolbarFrame.size;
+      } else {
+        UIBarButtonItem* button = [[UIBarButtonItem alloc]initWithTitle:@"No matching completions" style:UIBarButtonItemStylePlain target:nil action:nil];
+        UIFont * font = [UIFont systemFontOfSize:14];
+        NSDictionary * attributes = @{NSFontAttributeName: font};
+        [button setTitleTextAttributes:attributes forState:UIControlStateNormal];
+       
+        toolbar.items = [NSArray arrayWithObject:button];
+      }
+    }
+  }
+}
+
 @end

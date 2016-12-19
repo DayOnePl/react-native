@@ -314,6 +314,15 @@ static void RCTUpdatePlaceholder(RCTTextField *self)
   return result;
 }
 
+- (void)completionSelected:(UIBarButtonItem *)item {
+  NSString* text = item.title;
+  [self setText:text];
+  [self textFieldDidChange];
+  if(self.submitOnComplete) {
+    [self textFieldSubmitEditing];
+  }
+}
+
 #pragma mark - UITextFieldDelegate (Proxied)
 
 - (BOOL)shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string

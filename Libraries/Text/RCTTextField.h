@@ -22,9 +22,15 @@
 @property (nonatomic, strong) UIColor *placeholderTextColor;
 @property (nonatomic, assign) NSInteger mostRecentEventCount;
 @property (nonatomic, strong) NSNumber *maxLength;
+@property (nonatomic, assign) BOOL submitOnComplete;
 
 @property (nonatomic, copy) RCTDirectEventBlock onSelectionChange;
 
 - (instancetype)initWithEventDispatcher:(RCTEventDispatcher *)eventDispatcher NS_DESIGNATED_INITIALIZER;
+
+- (void)textFieldDidChange;
+- (void)sendKeyValueForString:(NSString *)string;
+- (BOOL)textFieldShouldEndEditing:(RCTTextField *)textField;
+- (void)completionSelected:(UIBarButtonItem *)item;
 
 @end
