@@ -127,4 +127,44 @@ RCT_EXPORT_VIEW_PROPERTY(mostRecentEventCount, NSInteger)
   };
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(withCompletions, BOOL, RCTTextField)
+{
+  if (json && [RCTConvert BOOL:json]) {
+    UIToolbar* toolbar = [[UIToolbar alloc] init];
+    [toolbar sizeToFit];
+    UIBarButtonItem* doneButton = [[UIBarButtonItem alloc]
+                                   initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+                                   target:view action:@selector(endEditing:)];
+    
+    toolbar.items = @[doneButton];
+    [toolbar setTintColor: [UIColor colorWithRed:0.88
+                                           green:0.31
+                                            blue:0.26
+                                           alpha:1]];
+    view.inputAccessoryView = toolbar;
+  } else {
+    view.inputAccessoryView = nil;
+  }
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(completions, NSArray*, RCTTextField)
+{
+  if (json && view.inputAccessoryView) {
+    NSArray* completions = [RCTConvert NSArray:json];
+    UIToolbar *toolbar = (UIToolbar *)view.inputAccessoryView;
+    
+    NSMutableArray *items = [NSMutableArray arrayWithCapacity:[completions count]];
+    for(NSString* completion in completions) {
+      UIBarButtonItem* button = [[UIBarButtonItem alloc] initWithTitle:completion
+                                                                 style:UIBarButtonItemStylePlain
+                                                                target:view
+                                                                action:@selector(completionSelected:)];
+
+      [items addObject:button];
+    }
+    
+    toolbar.items = items;
+  }
+}
+
 @end
