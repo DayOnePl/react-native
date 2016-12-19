@@ -139,4 +139,13 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
                                eventCount:_nativeEventCount];
 }
 
+- (void)completionSelected:(UIBarButtonItem *)item {
+  NSString* text = item.title;
+  [self setText:text];
+  [self textFieldDidChange];
+  if(self.submitOnComplete) {
+    [self textFieldSubmitEditing];
+  }
+}
+
 @end

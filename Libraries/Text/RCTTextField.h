@@ -16,9 +16,10 @@
 
 @class RCTUITextField;
 
-@interface RCTTextField : RCTTextInput
-
+@property (nonatomic, assign) BOOL textWasPasted;
+@property (nonatomic, assign) BOOL submitOnComplete;
 @property (nonatomic, assign) BOOL caretHidden;
 @property (nonatomic, strong) NSNumber *maxLength;
 
+- (void)completionSelected:(UIBarButtonItem *)item;
 @end
