@@ -132,16 +132,16 @@ RCT_CUSTOM_VIEW_PROPERTY(withCompletions, BOOL, RCTTextField)
   if (json && [RCTConvert BOOL:json]) {
     UIToolbar* toolbar = [[UIToolbar alloc] init];
     [toolbar sizeToFit];
-    UIBarButtonItem* doneButton = [[UIBarButtonItem alloc]
-                                   initWithBarButtonSystemItem:UIBarButtonSystemItemDone
-                                   target:view action:@selector(endEditing:)];
     
-    toolbar.items = @[doneButton];
-    [toolbar setTintColor: [UIColor colorWithRed:0.88
-                                           green:0.31
-                                            blue:0.26
-                                           alpha:1]];
-    view.inputAccessoryView = toolbar;
+    UIScrollView* scrollView = [[UIScrollView alloc]initWithFrame:[toolbar frame]];
+    scrollView.showsVerticalScrollIndicator = NO;
+    scrollView.showsHorizontalScrollIndicator = NO;
+    scrollView.backgroundColor = [UIColor colorWithRed:0.96 green:0.96 blue:0.95 alpha:1];
+    
+    
+    [scrollView addSubview:toolbar];
+    
+    view.inputAccessoryView = scrollView;
   } else {
     view.inputAccessoryView = nil;
   }
@@ -149,21 +149,42 @@ RCT_CUSTOM_VIEW_PROPERTY(withCompletions, BOOL, RCTTextField)
 
 RCT_CUSTOM_VIEW_PROPERTY(completions, NSArray*, RCTTextField)
 {
-  if (json && view.inputAccessoryView) {
-    NSArray* completions = [RCTConvert NSArray:json];
-    UIToolbar *toolbar = (UIToolbar *)view.inputAccessoryView;
+  if (view.inputAccessoryView) {
+    //    UIToolbar *toolbar = (UIToolbar *)view.inputAccessoryView;
+    UIScrollView *scroll = (UIScrollView *)view.inputAccessoryView;
+    UIToolbar *toolbar = [[scroll subviews] firstObject];
     
-    NSMutableArray *items = [NSMutableArray arrayWithCapacity:[completions count]];
-    for(NSString* completion in completions) {
-      UIBarButtonItem* button = [[UIBarButtonItem alloc] initWithTitle:completion
-                                                                 style:UIBarButtonItemStylePlain
-                                                                target:view
-                                                                action:@selector(completionSelected:)];
-
-      [items addObject:button];
+    if(json) {
+      NSArray* completions = [RCTConvert NSArray:json];
+      
+      if(completions.count > 0) {
+        NSMutableArray *items = [NSMutableArray arrayWithCapacity:[completions count]];
+        for(NSString* completion in completions) {
+          UIBarButtonItem* button = [[UIBarButtonItem alloc]initWithTitle:completion
+                                                                    style:UIBarButtonItemStylePlain
+                                                                   target:view
+                                                                   action:@selector(completionSelected:)];
+          [items addObject:button];
+        }
+      
+        toolbar.items = items;
+        
+        UIView* lastButton = toolbar.subviews.lastObject;
+        float newWidth = lastButton.frame.origin.x +
+                         lastButton.frame.size.width +
+                         lastButton.layoutMargins.right +
+                         toolbar.layoutMargins.left;
+        CGRect toolbarFrame = CGRectMake(0, 0, newWidth, toolbar.frame.size.height);
+        
+        [toolbar setFrame:toolbarFrame];
+        scroll.contentSize = toolbarFrame.size;
+        
+      } else {
+        UIBarButtonItem* button = [[UIBarButtonItem alloc]initWithTitle:@"No matching completions" style:UIBarButtonItemStylePlain target:nil action:nil];
+        toolbar.items = [NSArray arrayWithObject:button];
+        [toolbar sizeToFit];
+      }
     }
-    
-    toolbar.items = items;
   }
 }
 
