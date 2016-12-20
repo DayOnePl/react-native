@@ -160,18 +160,31 @@ RCT_CUSTOM_VIEW_PROPERTY(completions, NSArray*, RCTTextField)
     if(json) {
       NSArray* completions = [RCTConvert NSArray:json];
       
+      NSString *last = [completions lastObject];
       if(completions.count > 0) {
-        NSMutableArray *items = [NSMutableArray arrayWithCapacity:[completions count]];
+        NSMutableArray *items = [NSMutableArray arrayWithCapacity:([completions count] * 2) -1];
+        
+        CGFloat separatorHeight = toolbar.frame.size.height * 0.4;
+        
         for(NSString* completion in completions) {
           UIBarButtonItem* button = [[UIBarButtonItem alloc]initWithTitle:completion
                                                                     style:UIBarButtonItemStylePlain
                                                                    target:view
                                                                    action:@selector(completionSelected:)];
+          
           UIFont * font = [UIFont systemFontOfSize:14];
           NSDictionary * attributes = @{NSFontAttributeName: font};
           [button setTitleTextAttributes:attributes forState:UIControlStateNormal];
           
           [items addObject:button];
+          
+          if(completion != last) {
+            UIView * separator = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1, separatorHeight)];
+            separator.backgroundColor = toolbar.tintColor;
+            UIBarButtonItem *separatorButton = [[UIBarButtonItem alloc]initWithCustomView:separator];
+            
+            [items addObject:separatorButton];
+          }
         }
       
         toolbar.items = items;
@@ -185,7 +198,6 @@ RCT_CUSTOM_VIEW_PROPERTY(completions, NSArray*, RCTTextField)
         
         [toolbar setFrame:toolbarFrame];
         scroll.contentSize = toolbarFrame.size;
-        
       } else {
         UIBarButtonItem* button = [[UIBarButtonItem alloc]initWithTitle:@"No matching completions" style:UIBarButtonItemStylePlain target:nil action:nil];
         UIFont * font = [UIFont systemFontOfSize:14];
@@ -193,7 +205,6 @@ RCT_CUSTOM_VIEW_PROPERTY(completions, NSArray*, RCTTextField)
         [button setTitleTextAttributes:attributes forState:UIControlStateNormal];
        
         toolbar.items = [NSArray arrayWithObject:button];
-        [toolbar sizeToFit];
       }
     }
   }
