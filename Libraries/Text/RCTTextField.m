@@ -281,6 +281,9 @@ static void RCTUpdatePlaceholder(RCTTextField *self)
   NSString* text = item.title;
   [self setText:text];
   [self textFieldDidChange];
+  if(self.submitOnComplete) {
+    [self textFieldSubmitEditing];
+  }
 }
 
 @end
