@@ -128,6 +128,7 @@ RCT_CUSTOM_VIEW_PROPERTY(withCompletions, BOOL, RCTTextField)
 {
   if (json && [RCTConvert BOOL:json]) {
     UIToolbar* toolbar = [[UIToolbar alloc] init];
+    toolbar.tintColor = [UIColor colorWithRed:0.88 green:0.31 blue:0.26 alpha:1];
     [toolbar sizeToFit];
     
     UIScrollView* scrollView = [[UIScrollView alloc]initWithFrame:[toolbar frame]];
@@ -163,6 +164,10 @@ RCT_CUSTOM_VIEW_PROPERTY(completions, NSArray*, RCTTextField)
                                                                     style:UIBarButtonItemStylePlain
                                                                    target:view
                                                                    action:@selector(completionSelected:)];
+          UIFont * font = [UIFont systemFontOfSize:14];
+          NSDictionary * attributes = @{NSFontAttributeName: font};
+          [button setTitleTextAttributes:attributes forState:UIControlStateNormal];
+          
           [items addObject:button];
         }
       
@@ -180,6 +185,10 @@ RCT_CUSTOM_VIEW_PROPERTY(completions, NSArray*, RCTTextField)
         
       } else {
         UIBarButtonItem* button = [[UIBarButtonItem alloc]initWithTitle:@"No matching completions" style:UIBarButtonItemStylePlain target:nil action:nil];
+        UIFont * font = [UIFont systemFontOfSize:14];
+        NSDictionary * attributes = @{NSFontAttributeName: font};
+        [button setTitleTextAttributes:attributes forState:UIControlStateNormal];
+       
         toolbar.items = [NSArray arrayWithObject:button];
         [toolbar sizeToFit];
       }
