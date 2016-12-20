@@ -147,6 +147,8 @@ RCT_CUSTOM_VIEW_PROPERTY(withCompletions, BOOL, RCTTextField)
   }
 }
 
+RCT_EXPORT_VIEW_PROPERTY(submitOnComplete, BOOL)
+
 RCT_CUSTOM_VIEW_PROPERTY(completions, NSArray*, RCTTextField)
 {
   if (view.inputAccessoryView) {
